@@ -6,8 +6,10 @@ from replit import db
 from courseoutlineparser import *
 import pandas
 import joblib
+import sqlite3
 
 
+conection = sqlite3.connect('grades.db')
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -147,6 +149,28 @@ async def on_message(message):
         await message.channel.send("Your final grade is " + grade)
 
 
+    if message.author == client.administrator and message.content.contains("Save database"):
+        cursor = conection.cursor()
+        cursor.execute("CREATE TABLE grades (studentId TEXT, grade1 INTEGER, grade2 INTEGER, grade3 INTEGER)")
+        cursor.execute("INSERT INTO grades VALUES ('260111111', 80, 70, 90)")
+        cursor.execute("INSERT INTO grades VALUES ('260222222', 70, 80, 90)")
+
+    if message.author == client.administrator and message.content.contains("Get database"):
+        rows = cursor.execute("SELECT studentId, grade1, grade2, grade3 FROM grades").fetchall()
+        for row in rows:
+            await message.channel.send("Student " + row[0] + ", your grades are " + row[1] + " " + row[2] + " " + row[3])
+
+    if message.author == client.administrator and message.content.contains("Modify Grade3 260111111"):
+        new_grade3 = 100
+        studentId = 260111111
+        cursor.execute("UPDATE grades SET grade3 = ? WHERE studentId = ?",
+                       (new_grade3,studentId))
+
+    if message.author == client.administrator and message.content.contains("Modify Grade3 260222222"):
+        new_grade3 = 100
+        studentId = 260222222
+        cursor.execute("UPDATE grades SET grade3 = ? WHERE studentId = ?",
+                       (new_grade3,studentId))
 
 
 client.run("MTIzNzIxMjg4MDg1NjgwOTU3Mw.GKn6mL.G3QTQpZS4r5OHx7SPGGJSFqGBK-rhJrRmuGgBk")
