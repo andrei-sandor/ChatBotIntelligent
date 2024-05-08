@@ -7,6 +7,8 @@ from courseoutlineparser import *
 import pandas
 import joblib
 import sqlite3
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 conection = sqlite3.connect('grades.db')
@@ -191,6 +193,27 @@ async def on_message(message):
             index = int(message.content.split("delete", 1)[1])
             message.content = db["encouragements"]
         await message.channel.send(motivation)
+
+    if message.content.startswith("I need help please."):
+        analyse = SentimentIntensityAnalyzer()
+        score = analyse.polarity_scores(message.content)
+        for element in score:
+            if element == 'neg' and int(element) > 0.2:
+                await message.channel.send("Please see TA A")
+
+        for element in score:
+            if element == 'neu' and int(element) > 0.2:
+                await message.channel.send("Please see TA B")
+
+        for element in score:
+            if element == 'pos' and int(element) > 0.2:
+                await message.channel.send("Please see TA C")
+
+        for element in score:
+            if element == 'compound' and int(element) > 0.2:
+                await message.channel.send("Please see TA D")
+
+
 
 
 client.run("MTIzNzIxMjg4MDg1NjgwOTU3Mw.GKn6mL.G3QTQpZS4r5OHx7SPGGJSFqGBK-rhJrRmuGgBk")
