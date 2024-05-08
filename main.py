@@ -1,8 +1,11 @@
 import discord
 import os
 import openai
+import pandas as pd
 from replit import db
 from courseoutlineparser import *
+import pandas
+import joblib
 
 
 intents = discord.Intents.default()
@@ -15,6 +18,8 @@ OPENAI_KEY = os.getenv('OPENAI_KEY')
 
 # Set up the OpenAI API client
 openai.api_key = OPENAI_KEY
+
+global gradesSpreadsheet
 
 @client.event
 async def on_ready():
@@ -77,6 +82,69 @@ async def on_message(message):
                     await message.channel.send("Here is A2")
                     await message.send_file(open("A2.pdf"))
 
+    if message.author == client.administrator:
+        if message.content.contains("Please enter your grades"):
+            gradesSpreadsheet = pd.read_csv("gradesSpreadsheet.csv")
+
+    if message.content.startswith("260111111 Exam1"):
+        gradesSpreadsheet["260111111"].loc["Exam1"] = message.content[2]
+        model = joblib.load('model_dnn2_grade1.joblib')
+        prediction = model.predict([message.content[2]])
+        await message.channel.send("Your predicted final grade is " + prediction)
+
+        grade_for_a = 85 - (int(message.content[2])) * 0.25
+        grade_for_pass = 55 - (int(message.content[2])) * 0.25
+
+        await message.channel.send("You need " + grade_for_a + "to get an A")
+        await message.channel.send("You need " + grade_for_pass + "to pass")
+
+    if message.content.startswith("260111111 Exam2"):
+        gradesSpreadsheet["260111111"].loc["Exam2"] = message.content[2]
+        model = joblib.load('model_dnn2_grade2.joblib')
+        prediction = model.predict([message.content[2]])
+        await message.channel.send("Your predicted final grade is " + prediction)
+
+        grade_for_a = 85 - (int(message.content[2])) * 0.25 - (int (gradesSpreadsheet['260111111'].iloc['Exam1'])) * 0.25
+        grade_for_pass = 55 - (int(message.content[2])) * 0.25 - (int (gradesSpreadsheet['260111111'].iloc['Exam1'])) * 0.25
+
+        await message.channel.send("You need " + grade_for_a + "to get an A")
+        await message.channel.send("You need " + grade_for_pass + "to pass")
+
+    if message.content.startswith("260111111 Exam3"):
+        gradesSpreadsheet["260111111"].loc["Exam3"] = message.content[2]
+
+        grade = (int(message.content[2])) * 0.50 + (int(gradesSpreadsheet['260111111'].iloc['Exam1'])) * 0.25 + (int(gradesSpreadsheet['260111111'].iloc['Exam2'])) * 0.25
+        await message.channel.send("Your final grade is " + grade)
+
+    if message.content.startswith("260222222 Exam1"):
+        gradesSpreadsheet["260222222"].loc["Exam1"] = message.content[2]
+        model = joblib.load('model_dnn2_grade1.joblib')
+        prediction = model.predict([message.content[2]])
+        await message.channel.send("Your predicted final grade is " + prediction)
+
+        grade_for_a = 85 - (int(message.content[2])) * 0.25
+        grade_for_pass = 55 - (int(message.content[2])) * 0.25
+
+        await message.channel.send("You need " + grade_for_a + "to get an A")
+        await message.channel.send("You need " + grade_for_pass + "to pass")
+
+    if message.content.startswith("260222222 Exam2"):
+        gradesSpreadsheet["260222222"].loc["Exam2"] = message.content[2]
+        model = joblib.load('model_dnn2_grade2.joblib')
+        prediction = model.predict([message.content[2]])
+        await message.channel.send("Your predicted final grade is " + prediction)
+
+        grade_for_a = 85 - (int(message.content[2])) * 0.25 - (int (gradesSpreadsheet['260222222'].iloc['Exam1'])) * 0.25
+        grade_for_pass = 55 - (int(message.content[2])) * 0.25 - (int (gradesSpreadsheet['260222222'].iloc['Exam1'])) * 0.25
+
+        await message.channel.send("You need " + grade_for_a + "to get an A")
+        await message.channel.send("You need " + grade_for_pass + "to pass")
+
+    if message.content.startswith("260222222 Exam3"):
+        gradesSpreadsheet["260222222"].loc["Exam3"] = message.content[2]
+
+        grade = (int(message.content[2])) * 0.50 + (int(gradesSpreadsheet['260222222'].iloc['Exam1'])) * 0.25 + (int(gradesSpreadsheet['260222222'].iloc['Exam2'])) * 0.25
+        await message.channel.send("Your final grade is " + grade)
 
 
 
