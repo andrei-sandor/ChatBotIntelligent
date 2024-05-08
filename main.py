@@ -172,5 +172,25 @@ async def on_message(message):
         cursor.execute("UPDATE grades SET grade3 = ? WHERE studentId = ?",
                        (new_grade3,studentId))
 
+    motivation_quotes = ["It takes courage to grow up and become who you really are. — E.E. Cummings",
+                        "Nothing is impossible. The word itself says 'I'm possible!' — Audrey Hepburn",
+                        "Keep your face always toward the sunshine, and shadows will fall behind you. — Walt Whitman",
+                        "Attitude is a little thing that makes a big difference. — Winston Churchill"
+                         ]
+    options = motivation_quotes
+    if "motivation" in db.keys():
+        options = options + db["motivation"]
+
+    if message.content.startswith("quote"):
+        motivation_quotes = message.content.split("quote ", 1)[1]
+        await message.channel.send("New encouraging message added.")
+
+    if message.content.startswith("$del"):
+        motivation = []
+        if "motivation" in db.keys():
+            index = int(message.content.split("delete", 1)[1])
+            message.content = db["encouragements"]
+        await message.channel.send(motivation)
+
 
 client.run("MTIzNzIxMjg4MDg1NjgwOTU3Mw.GKn6mL.G3QTQpZS4r5OHx7SPGGJSFqGBK-rhJrRmuGgBk")
